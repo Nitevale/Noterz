@@ -1,0 +1,213 @@
+_ViewCarModal.cshtml
+@model CarsEntity
+
+<div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewModalLabel">View Car Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Brand:</strong> @Model.Brand</p>
+                <p><strong>Model:</strong> @Model.Model</p>
+                <p><strong>Version:</strong> @Model.Version</p>
+                <p><strong>Plate Number:</strong> @Model.PlateNum</p>
+                <p><strong>Car Type:</strong> @Model.CarType</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+_EditCarModal.cshtml
+@model CarsEntity
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Car Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" method="post" asp-action="Edit" asp-controller="Car">
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <div class="form-group">
+                        <label for="editBrand">Brand</label>
+                        <input type="text" class="form-control" id="editBrand" name="Brand" value="@Model.Brand" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editModel">Model</label>
+                        <input type="text" class="form-control" id="editModel" name="Model" value="@Model.Model" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editVersion">Version</label>
+                        <input type="text" class="form-control" id="editVersion" name="Version" value="@Model.Version" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editPlateNum">Plate Number</label>
+                        <input type="text" class="form-control" id="editPlateNum" name="PlateNum" value="@Model.PlateNum" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editCarType">Car Type</label>
+                        <input type="text" class="form-control" id="editCarType" name="CarType" value="@Model.CarType" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+Index.cshtml
+@model List<CarsEntity>
+
+@{
+    ViewData["Title"] = "Cars";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Car Inventory</h2>
+    <div class="row mb-3">
+        <div class="col-md-12 text-right">
+            <a asp-action="Create" asp-controller="Car" class="btn btn-success">Add +</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped table-bordered table-hover table-responsive">
+                <thead class="thead-dark text-white bg-dark">
+                    <tr>
+                        <td>Brand</td>
+                        <td>Model</td>
+                        <td>Version</td>
+                        <td>Plate Number</td>
+                        <td>Car Type</td>
+                        <td class="action-column">Action</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in Model) {
+                        <tr>
+                            <td>@item.Brand</td>
+                            <td>@item.Model</td>
+                            <td>@item.Version</td>
+                            <td>@item.PlateNum</td>
+                            <td>@item.CarType</td>
+                            <td>
+                                <button type="button" class="btn btn-info btn-sm view-button" data-id="@item.Id"><i class="fa-solid fa-eye"></i></button>
+                                <button type="button" class="btn btn-primary btn-sm edit-button" data-id="@item.Id"><i class="fa-regular fa-pen-to-square"></i></button>
+                                <button type="button" class="btn btn-danger btn-sm delete-button" data-id="@item.Id"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalContainer"></div>
+
+<!-- Include delete modal as in your original code -->
+
+<style>
+    .action-column {
+        width: 90px;
+    }
+</style>
+
+<script>
+    $(document).on('click', '.view-button', function () {
+        var id = $(this).data('id');
+        $.ajax({
+            url: '@Url.Action("ViewCarModal", "Car")',
+            data: { id: id },
+            success: function (data) {
+                $('#modalContainer').html(data);
+                $('#viewModal').modal('show');
+            }
+        });
+    });
+
+    $(document).on('click', '.edit-button', function () {
+        var id = $(this).data('id');
+        $.ajax({
+            url: '@Url.Action("EditCarModal", "Car")',
+            data: { id: id },
+            success: function (data) {
+                $('#modalContainer').html(data);
+                $('#editModal').modal('show');
+            }
+        });
+    });
+</script>
+
+site.js
+$(document).on('click', '.view-button', function () {
+    var id = $(this).data('id');
+    $.ajax({
+        url: '/Car/ViewCarModal',
+        data: { id: id },
+        success: function (data) {
+            $('#modalContainer').html(data);
+            $('#viewModal').modal('show');
+        }
+    });
+});
+
+$(document).on('click', '.edit-button', function () {
+    var id = $(this).data('id');
+    $.ajax({
+        url: '/Car/EditCarModal',
+        data: { id: id },
+        success: function (data) {
+            $('#modalContainer').html(data);
+            $('#editModal').modal('show');
+        }
+    });
+});
+
+CarController.cs
+public class CarController : Controller
+{
+    private readonly ApplicationDbContext _context;
+
+    public CarController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public IActionResult ViewCarModal(int id)
+    {
+        var car = _context.Cars.Find(id);
+        return PartialView("_ViewCarModal", car);
+    }
+
+    public IActionResult EditCarModal(int id)
+    {
+        var car = _context.Cars.Find(id);
+        return PartialView("_EditCarModal", car);
+    }
+
+    [HttpPost]
+    public IActionResult Edit(CarsEntity car)
+    {
+        if (ModelState.IsValid)
+        {
+            _context.Update(car);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        return View(car);
+    }
+
+    // Other actions (Create, Delete, etc.) remain the same
+}
