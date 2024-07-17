@@ -211,3 +211,5 @@ public class CarController : Controller
 
     // Other actions (Create, Delete, etc.) remain the same
 }
+
+https://chatgpt.com/share/e3b98c18-4c13-4380-ba7f-b1d8fa75e54e
